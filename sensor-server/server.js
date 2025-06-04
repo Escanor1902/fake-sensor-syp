@@ -58,7 +58,7 @@ setInterval(async () => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     await connection.execute(
-      'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, windgeschwindigkeit, uv_index, zeitstempel) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, windgeschwindigkeit, uvindex, zeitstempel) VALUES (?, ?, ?, ?, ?)',
       [sensorData.temperature, sensorData.humidity, sensorData.windSpeed, sensorData.uvIndex, sensorData.timestamp]
     );
     await connection.end();

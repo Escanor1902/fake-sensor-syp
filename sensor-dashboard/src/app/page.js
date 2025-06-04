@@ -61,7 +61,6 @@ export default function Home() {
   return (
     <main>
       <h1>Live Sensor Dashboard</h1>
-
       <div className="chart">
         <div className="date">
           <label htmlFor="start" className="dateInput">Start date:</label>
@@ -75,11 +74,14 @@ export default function Home() {
             max={today}
             className="border rounded p-2"
           />
+
+          
         </div>
         <SensorChart data={sensorData} />
       </div>
-
+      <div className='right-side'>
       <SensorGauges values={gaugeValues} />
+      </div>
     </main>
   );
 }
