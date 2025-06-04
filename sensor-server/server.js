@@ -46,8 +46,10 @@ app.get('/api/sensor-data', async (req, res) => {
 
 setInterval(async () => {
   const sensorData = {
-    temperature: (20 + Math.random() * 10).toFixed(2),
-    humidity: (40 + Math.random() * 20).toFixed(2),
+    temperature: (20 + Math.random() * 10).toFixed(2),       // 20-30 °C
+    humidity: (40 + Math.random() * 20).toFixed(2),          // 40-60 %
+    windSpeed: (0 + Math.random() * 150).toFixed(2),         // 0-150 km/h
+    uvIndex: Math.floor(Math.random() * 12),                  // 0-11 UV-Index (ganzzahlig)
     timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
   };
 
@@ -56,14 +58,15 @@ setInterval(async () => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     await connection.execute(
-      'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, zeitstempel) VALUES (?, ?, ?)',
-      [sensorData.temperature, sensorData.humidity, sensorData.timestamp]
+      'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, windgeschwindigkeit, uv_index, zeitstempel) VALUES (?, ?, ?, ?, ?)',
+      [sensorData.temperature, sensorData.humidity, sensorData.windSpeed, sensorData.uvIndex, sensorData.timestamp]
     );
     await connection.end();
   } catch (err) {
     console.error('Fehler beim Speichern in der DB:', err);
   }
 }, 2000);
+
 
 server.listen(3000, () => {
   console.log('Sensor-Server läuft auf http://localhost:3000');
