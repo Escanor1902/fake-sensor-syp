@@ -9,5 +9,11 @@
     },
     "devDependencies": {
         "concurrently": "^7.6.0"
+    },
+    "dependencies": {
+        "express": "^5.1.0",
+        "mysql": "^2.18.1",
+        "mysql2": "^3.14.1",
+        "socket.io": "^4.8.1"
     }
 }
