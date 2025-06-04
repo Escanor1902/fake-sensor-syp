@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3001', // Frontend-Origin anpassen
+    origin: 'http://localhost:3001', 
     methods: ['GET', 'POST'],
   },
 });
@@ -19,13 +19,12 @@ app.use(cors());
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'root', // Passwort anpassen
+  password: 'root',
   database: 'fakesensor',
 };
 
 app.get('/', (req, res) => res.send('Sensor-Server läuft'));
 
-// Neue API-Route für Datenabfrage nach Datum
 app.get('/api/sensor-data', async (req, res) => {
   const date = req.query.date;
   if (!date) return res.status(400).json({ error: 'Datum fehlt' });
