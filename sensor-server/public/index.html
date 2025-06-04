@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor-Daten</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 2em; }
+        .data { margin-top: 1em; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <h1>Live Sensor-Daten</h1>
+   <h2>Auswahl Datensammlung</h2> 
+    <div class="data" id="data"></div>
+
+    <script>
+        const socket = io();
+
+        socket.on('sensorData', (data) => {
+            document.getElementById('data').innerHTML = `
+                <strong>Temperatur:</strong> ${data.temperature} °C<br>
+                <strong>Luftfeuchtigkeit:</strong> ${data.humidity} %<br>
+                <strong>Zeit:</strong> ${new Date(data.timestamp).toLocaleTimeString()}
+            `;
+        });
+    </script>
+</body>
+</html>

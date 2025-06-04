@@ -1,0 +1,13 @@
+{
+    "name": "sensorProjektSyp",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "start": "concurrently \"npm run start:server\" \"npm run start:dashboard\"",
+        "start:server": "cd ./sensor-server && npm start",
+        "start:dashboard": "cd ./sensor-dashboard && npm run dev"
+    },
+    "devDependencies": {
+        "concurrently": "^7.6.0"
+    }
+}
