@@ -21,42 +21,59 @@ export default function Home() {
   const isLive = selectedDate === '' || selectedDate === today;
 
   // Daten per HTTP-API laden, wenn sich das Datum ändert
-  useEffect(() => {
-    if (isLive) {
-      setSensorData([]); // clear old data if switching to live mode
-      return;
-    }
+useEffect(() => {
+  if (!selectedDate) {
+    setSensorData([]);
+    return;
+  }
 
-    async function fetchData() {
-      try {
-        const res = await fetch(`http://localhost:3000/api/sensor-data?date=${selectedDate}`);
-        const data = await res.json();
-        setSensorData(data);
-      } catch (error) {
-        console.error('Fehler beim Laden der Sensordaten:', error);
-      }
-    }
+  // Immer zurücksetzen, bevor neu geladen wird
+  setSensorData([]);
 
-    fetchData();
-  }, [selectedDate, isLive]);
+  async function fetchData() {
+    try {
+      const res = await fetch(`http://localhost:3000/api/sensor-data?date=${selectedDate}`);
+      const data = await res.json();
+      setSensorData(data);
+    } catch (error) {
+      console.error('Fehler beim Laden der Sensordaten:', error);
+    }
+  }
+
+  fetchData();
+}, [selectedDate]);
+
+
 
   // Socket.io-Verbindung aufbauen für Live-Daten
   useEffect(() => {
-    const socket = io('http://localhost:3000');
+  const socket = io('http://localhost:3000');
 
-    socket.on('sensorData', (data) => {
-      setLiveData({
-        temperature: parseFloat(data.temperature),
-        humidity: parseFloat(data.humidity),
-        windSpeed: parseFloat(data.windSpeed),
-        uvIndex: parseInt(data.uvIndex, 10),
-      });
+  socket.on('sensorData', (data) => {
+    setLiveData({
+      temperature: parseFloat(data.temperature),
+      humidity: parseFloat(data.humidity),
+      windSpeed: parseFloat(data.windSpeed),
+      uvIndex: parseInt(data.uvIndex, 10),
     });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    const nowDate = new Date().toISOString().split('T')[0];
+    if (selectedDate === nowDate) {
+      setSensorData(prev => [
+        ...prev,
+        {
+          temperatur: data.temperature,
+          luftfeuchtigkeit: data.humidity,
+          zeitstempel: data.timestamp,
+        }
+      ]);
+    }
+  });
+
+  return () => {
+    socket.disconnect();
+  };
+}, [selectedDate]);
 
   // Werte für Gauges aus liveData
   const gaugeValues = {

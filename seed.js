@@ -3,11 +3,11 @@ const mysql = require('mysql2/promise');
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'HeTian?',
+  password: 'root',
   database: 'fakesensor',
 };
 
-// Generate a timestamp for a specific date + random time in that day
+// Zufällige Uhrzeit für ein bestimmtes Datum generieren
 function getRandomTimeOnDate(date) {
   const dayStart = new Date(date);
   dayStart.setHours(0, 0, 0, 0);
@@ -18,12 +18,11 @@ function getRandomTimeOnDate(date) {
 }
 
 async function seedDatabase(entriesPerDay = 10, startDate = '2023-01-01', endDate = null) {
-  endDate = endDate || new Date().toISOString().slice(0, 10); // today if not provided
+  endDate = endDate || new Date().toISOString().slice(0, 10); // heute
 
   const connection = await mysql.createConnection(dbConfig);
 
   let currentDate = new Date(startDate);
-
   const lastDate = new Date(endDate);
 
   while (currentDate <= lastDate) {
@@ -32,27 +31,28 @@ async function seedDatabase(entriesPerDay = 10, startDate = '2023-01-01', endDat
     for (let i = 0; i < entriesPerDay; i++) {
       const temperature = (20 + Math.random() * 10).toFixed(2);
       const humidity = (40 + Math.random() * 20).toFixed(2);
+      const windSpeed = (Math.random() * 150).toFixed(2); // 0–150 km/h
+      const uvIndex = Math.floor(Math.random() * 12);     // 0–11
       const timestamp = getRandomTimeOnDate(dateString);
 
       try {
         await connection.execute(
-          'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, zeitstempel) VALUES (?, ?, ?)',
-          [temperature, humidity, timestamp]
+          'INSERT INTO messwerte (temperatur, luftfeuchtigkeit, windgeschwindigkeit, uvindex, zeitstempel) VALUES (?, ?, ?, ?, ?)',
+          [temperature, humidity, windSpeed, uvIndex, timestamp]
         );
       } catch (err) {
         console.error('Fehler beim Seed-Speichern:', err);
       }
     }
 
-    // next day
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
   await connection.end();
-  console.log(`Historische Einträge eingefügt: ${entriesPerDay} pro Tag von ${startDate} bis ${endDate}.`);
+  console.log(`✅ Historische Daten eingefügt: ${entriesPerDay} pro Tag von ${startDate} bis ${endDate}.`);
 }
 
-// Usage: Generate 10 entries per day from 2023-01-01 to yesterday
+// Starte das Script
 seedDatabase(10, '2023-01-01', new Date(Date.now() - 86400000).toISOString().slice(0, 10))
   .then(() => process.exit(0))
   .catch((err) => {
