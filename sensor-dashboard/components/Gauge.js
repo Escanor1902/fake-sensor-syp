@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-export default function Gauge({ label, value, unit, min, max }) {
-  const angle = ((value - min) / (max - min)) * 180 - 90; // Zeiger von -90° bis +90°
+export default function Gauge({ label, value, unit, min = 0, max = 100 }) {
+  const angle = ((value - min) / (max - min)) * 180 - 90;
 
   return (
     <div className="gauge">
