@@ -80,7 +80,9 @@ export default function Home() {
         <SensorChart data={sensorData} />
       </div>
       <div className='right-side'>
-      <SensorGauges values={gaugeValues} />
+        <div className="gauge-grid">
+        <SensorGauges values={gaugeValues} />
+        </div>
       </div>
     </main>
   );
