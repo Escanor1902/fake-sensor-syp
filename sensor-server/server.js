@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3001', 
+    origin: 'http://localhost:3001',
     methods: ['GET', 'POST'],
   },
 });
@@ -19,7 +19,7 @@ app.use(cors());
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: 'HeTian?',
   database: 'fakesensor',
 };
 
@@ -27,12 +27,18 @@ app.get('/', (req, res) => res.send('Sensor-Server läuft'));
 
 app.get('/api/sensor-data', async (req, res) => {
   const date = req.query.date;
-  if (!date) return res.status(400).json({ error: 'Datum fehlt' });
+
+  if (!date) {
+    return res.status(400).json({ error: 'date ist erforderlich' });
+  }
 
   try {
     const connection = await mysql.createConnection(dbConfig);
     const [rows] = await connection.execute(
-      "SELECT temperatur, luftfeuchtigkeit, zeitstempel FROM messwerte WHERE DATE(zeitstempel) = ?",
+      `SELECT temperatur, luftfeuchtigkeit, zeitstempel 
+       FROM messwerte
+       WHERE DATE(zeitstempel) = ?
+       ORDER BY zeitstempel ASC`,
       [date]
     );
     await connection.end();
