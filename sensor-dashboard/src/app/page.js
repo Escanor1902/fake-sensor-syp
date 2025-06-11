@@ -6,11 +6,9 @@ import SensorChart from '../../components/SensorChart.js';
 import SensorGauges from '../../components/SensorGauges.js';
 
 export default function Home() {
-
   const [selectedDate, setSelectedDate] = useState('');
-  const [date, setDate] = useState('2023-01-01');
-  const [sensorData, setSensorData] = useState([]);   // API-Daten für Chart
-  const [liveData, setLiveData] = useState({          // Live-Daten für Gauges
+  const [sensorData, setSensorData] = useState([]);
+  const [liveData, setLiveData] = useState({
     temperature: 0,
     humidity: 0,
     windSpeed: 0,
@@ -18,64 +16,61 @@ export default function Home() {
   });
 
   const today = new Date().toISOString().split('T')[0];
+
   const isLive = selectedDate === '' || selectedDate === today;
 
-  // Daten per HTTP-API laden, wenn sich das Datum ändert
-useEffect(() => {
-  if (!selectedDate) {
-    setSensorData([]);
-    return;
-  }
-
-  // Immer zurücksetzen, bevor neu geladen wird
-  setSensorData([]);
-
-  async function fetchData() {
-    try {
-      const res = await fetch(`http://localhost:3000/api/sensor-data?date=${selectedDate}`);
-      const data = await res.json();
-      setSensorData(data);
-    } catch (error) {
-      console.error('Fehler beim Laden der Sensordaten:', error);
-    }
-  }
-
-  fetchData();
-}, [selectedDate]);
-
-
-
-  // Socket.io-Verbindung aufbauen für Live-Daten
+  // Daten vom Server laden (historisch oder heute)
   useEffect(() => {
-  const socket = io('http://localhost:3000');
+    if (!selectedDate) {
+      setSensorData([]);
+      return;
+    }
 
-  socket.on('sensorData', (data) => {
-    setLiveData({
-      temperature: parseFloat(data.temperature),
-      humidity: parseFloat(data.humidity),
-      windSpeed: parseFloat(data.windSpeed),
-      uvIndex: parseInt(data.uvIndex, 10),
+    setSensorData([]); // Verlauf vor jedem Fetch zurücksetzen
+
+    async function fetchData() {
+      try {
+        const res = await fetch(`http://localhost:3000/api/sensor-data?date=${selectedDate}`);
+        const data = await res.json();
+        setSensorData(data);
+      } catch (error) {
+        console.error('Fehler beim Laden der Sensordaten:', error);
+      }
+    }
+
+    fetchData();
+  }, [selectedDate]);
+
+  // Socket.IO für Live-Daten
+  useEffect(() => {
+    const socket = io('http://localhost:3000');
+
+    socket.on('sensorData', (data) => {
+      setLiveData({
+        temperature: parseFloat(data.temperature),
+        humidity: parseFloat(data.humidity),
+        windSpeed: parseFloat(data.windSpeed),
+        uvIndex: parseInt(data.uvIndex, 10),
+      });
+
+      const nowDate = new Date().toISOString().split('T')[0];
+      if (selectedDate === nowDate) {
+        setSensorData((prev) => [
+          ...prev,
+          {
+            temperatur: data.temperature,
+            luftfeuchtigkeit: data.humidity,
+            zeitstempel: data.timestamp,
+          },
+        ]);
+      }
     });
 
-    const nowDate = new Date().toISOString().split('T')[0];
-    if (selectedDate === nowDate) {
-      setSensorData(prev => [
-        ...prev,
-        {
-          temperatur: data.temperature,
-          luftfeuchtigkeit: data.humidity,
-          zeitstempel: data.timestamp,
-        }
-      ]);
-    }
-  });
+    return () => {
+      socket.disconnect();
+    };
+  }, [selectedDate]);
 
-  return () => {
-    socket.disconnect();
-  };
-}, [selectedDate]);
-
-  // Werte für Gauges aus liveData
   const gaugeValues = {
     temp: liveData.temperature,
     humidity: liveData.humidity,
@@ -84,27 +79,29 @@ useEffect(() => {
   };
 
   return (
-    <main className="p-4">
-      <h1 className="text-xl font-bold mb-4">Sensor Dashboard</h1>
+    <>
+      <h1 className="dashboard-title">Sensor Dashboard</h1>
 
-      <div className="mb-4">
-        <label htmlFor="start" className="mr-2">Datum wählen:</label>
-        <input
-          type="date"
-          id="start"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          max={today}
-          className="border rounded p-2"
-        />
-      </div>
-      <SensorChart data={sensorData} isLive={isLive} />
-      
-      <div className='right-side'>
-        <div className="gauge-grid">
+      <main>
+        <div className="left-side">
+          <div className="mb-4">
+            <label htmlFor="start" className="mr-2">Datum wählen:</label>
+            <input
+              type="date"
+              id="start"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              max={today}
+              className="border rounded p-2"
+            />
+          </div>
+          <SensorChart data={sensorData} isLive={isLive} />
+        </div>
+
+        <div className="right-side">
           <SensorGauges values={gaugeValues} />
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
