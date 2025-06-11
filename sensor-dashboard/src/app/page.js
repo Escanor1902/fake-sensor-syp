@@ -4,43 +4,47 @@ import { useState, useEffect } from 'react';
 import SensorChart from '../../components/SensorChart.js';
 
 export default function Home() {
-  const [date, setDate] = useState('2023-01-01');
+  const [selectedDate, setSelectedDate] = useState('');
   const [sensorData, setSensorData] = useState([]);
   const today = new Date().toISOString().split('T')[0];
+  const isLive = selectedDate === '' || selectedDate === today;
 
   useEffect(() => {
+    if (isLive) {
+      setSensorData([]); // clear old data if switching to live mode
+      return;
+    }
+
     async function fetchData() {
-      if (!date) return;
       try {
-        const res = await fetch(`http://localhost:3000/api/sensor-data?date=${date}`);
+        const res = await fetch(`http://localhost:3000/api/sensor-data?date=${selectedDate}`);
         const data = await res.json();
         setSensorData(data);
       } catch (error) {
         console.error('Fehler beim Laden der Sensordaten:', error);
       }
     }
+
     fetchData();
-  }, [date]);
+  }, [selectedDate, isLive]);
 
   return (
-    <main>
-      <h1>Live Sensor Dashboard</h1>
-      <div className="chart">
-        <div className="date">
-          <label htmlFor="start" className="dateInput">Start date:</label>
-          <input
-            type="date"
-            id="start"
-            name="trip-start"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            min="2023-01-01"
-            max={today}
-            className="border rounded p-2"
-          />
-        </div>
-        <SensorChart data={sensorData} />
+    <main className="p-4">
+      <h1 className="text-xl font-bold mb-4">Sensor Dashboard</h1>
+
+      <div className="mb-4">
+        <label htmlFor="start" className="mr-2">Datum wählen:</label>
+        <input
+          type="date"
+          id="start"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          max={today}
+          className="border rounded p-2"
+        />
       </div>
+
+      <SensorChart data={sensorData} isLive={isLive} />
     </main>
   );
 }
