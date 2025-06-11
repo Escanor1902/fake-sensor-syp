@@ -19,7 +19,7 @@ app.use(cors());
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: 'HeTian?',
   database: 'fakesensor',
 };
 
@@ -50,12 +50,13 @@ app.get('/api/sensor-data', async (req, res) => {
 });
 
 setInterval(async () => {
+  const now = new Date();
   const sensorData = {
     temperature: (20 + Math.random() * 10).toFixed(2),       // 20-30 °C
     humidity: (40 + Math.random() * 20).toFixed(2),          // 40-60 %
     windSpeed: (0 + Math.random() * 150).toFixed(2),         // 0-150 km/h
     uvIndex: Math.floor(Math.random() * 12),                  // 0-11 UV-Index (ganzzahlig)
-    timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    timestamp: now.toISOString().slice(0, 19).replace('T', ' '),
   };
 
   io.emit('sensorData', sensorData);

@@ -25,7 +25,14 @@ export default function SensorChart({ data = [], isLive }) {
     if (!isLive) return;
 
     const handleSensorData = (data) => {
-      setLabels((prev) => [...prev.slice(-maxLength + 1), new Date(data.timestamp).toLocaleString([], {day: '2-digit',month: '2-digit',year: 'numeric',hour: '2-digit',minute: '2-digit'})]);
+      setLabels((prev) => [...prev.slice(-maxLength + 1), new Date(data.timestamp).toLocaleString([], {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })]);
       setTemps((prev) => [...prev.slice(-maxLength + 1), data.temperature]);
       setHumids((prev) => [...prev.slice(-maxLength + 1), data.humidity]);
     };
