@@ -74,11 +74,11 @@ export default function Home() {
             max={today}
             className="border rounded p-2"
           />
-
-          
         </div>
         <SensorChart data={sensorData} />
       </div>
+
+      
       <div className='right-side'>
         <div className="gauge-grid">
         <SensorGauges values={gaugeValues} />
