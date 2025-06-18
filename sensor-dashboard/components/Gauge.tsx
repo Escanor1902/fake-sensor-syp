@@ -34,7 +34,8 @@ export default function Gauge({
         {ticks.map((tick, idx) => (
           <div
             key={idx}
-            className="gauge-tick"
+            className={`gauge-tick ${tick.angle <= -85 || tick.angle >= 85 ? 'edge-tick' : ''
+              }`}
             style={{
               transform: `rotate(${tick.angle}deg) translateY(-48px)`,
             }}
