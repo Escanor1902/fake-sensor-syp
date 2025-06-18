@@ -19,7 +19,7 @@ app.use(cors());
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'HeTian?',
+  password: 'root',
   database: 'fakesensor',
 };
 

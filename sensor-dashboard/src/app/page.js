@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import SensorChart from '../../components/SensorChart.js';
-import SensorGauges from '../../components/SensorGauges.js';
+import Gauge from '../../components/Gauge.tsx';
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState('');
@@ -97,9 +97,39 @@ export default function Home() {
           </div>
           <SensorChart data={sensorData} isLive={isLive} />
         </div>
-
-        <div className="right-side">
-          <SensorGauges values={gaugeValues} />
+          <div className="right-side">
+  <Gauge
+    label="Temperatur"
+    value={liveData.temperature}
+    unit="°C"
+    min={-10}
+    max={40}
+    steps={5}
+  />
+  <Gauge
+    label="Luftfeuchtigkeit"
+    value={liveData.humidity}
+    unit="%"
+    min={0}
+    max={100}
+    steps={10}
+  />
+  <Gauge
+    label="Windgeschwindigkeit"
+    value={liveData.windSpeed}
+    unit="km/h"
+    min={0}
+    max={120}
+    steps={6}
+  />
+  <Gauge
+    label="UV-Index"
+    value={liveData.uvIndex}
+    unit=""
+    min={0}
+    max={11}
+    steps={11}
+  />
         </div>
       </main>
     </>
