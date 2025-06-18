@@ -25,7 +25,8 @@ export default function SensorChart({ data = [], isLive }) {
     if (!isLive) return;
 
     const handleSensorData = (data) => {
-      setLabels((prev) => [...prev.slice(-maxLength + 1), new Date(data.timestamp).toLocaleString([], {
+      setLabels((prev) => [...prev.slice(-maxLength + 1), new Date(data.timestamp).toLocaleString('de-DE', {
+        timeZone: 'Europe/Berlin',
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',

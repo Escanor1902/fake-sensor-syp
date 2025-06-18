@@ -105,6 +105,7 @@ export default function Home() {
     min={-10}
     max={40}
     steps={5}
+    angleRange={160}
   />
   <Gauge
     label="Luftfeuchtigkeit"
@@ -113,6 +114,7 @@ export default function Home() {
     min={0}
     max={100}
     steps={10}
+    angleRange={160}
   />
   <Gauge
     label="Windgeschwindigkeit"
@@ -121,6 +123,7 @@ export default function Home() {
     min={0}
     max={120}
     steps={6}
+    angleRange={160}
   />
   <Gauge
     label="UV-Index"
@@ -129,6 +132,7 @@ export default function Home() {
     min={0}
     max={11}
     steps={11}
+    angleRange={160}
   />
         </div>
       </main>
