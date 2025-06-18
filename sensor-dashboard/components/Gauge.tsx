@@ -9,7 +9,7 @@ type GaugeProps = {
   min?: number;
   max?: number;
   steps?: number;
-  angleRange?: number; // z. B. 150°
+  angleRange?: number; 
 };
 
 export default function Gauge({

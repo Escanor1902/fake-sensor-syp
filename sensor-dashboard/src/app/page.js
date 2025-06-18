@@ -60,7 +60,7 @@ export default function Home() {
           {
             temperatur: data.temperature,
             luftfeuchtigkeit: data.humidity,
-            zeitstempel: data.timestamp,
+            zeitstempel: new Date().toISOString(),
           },
         ]);
       }
